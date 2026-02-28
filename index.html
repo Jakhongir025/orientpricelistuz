@@ -317,15 +317,13 @@
         en: { deposit: "Deposit", seats: "Seats", fuel: "Fuel", cons: "Consum.", daily: "Daily", book: "Book Now", view: "Images", search: "Search car...", all: "All" }
     };
 
-
-
     const cars = [
-        { name: "Gentra", class: "Economy", price: "500,000", dep: "2,000,000", seats: 5, fuel: "Benzin", cons: "9L", link: "https://t.me/orientrentcar_images/54" },
-        { name: "Monza", class: "Economy", price: "600,000", dep: "3,000,000", seats: 5, fuel: "Benzin", cons: "7L", link: "https://t.me/orientrentcar_images/142" },
-        { name: "Onix", class: "Economy", price: "500,000", dep: "2,000,000", seats: 5, fuel: "Benzin", cons: "6.5L", link: "https://t.me/orientrentcar_images/285" },
-        { name: "Tracker 2", class: "Comfort", price: "700,000", dep: "3,000,000", seats: 5, fuel: "Benzin", cons: "7.5L", link: "https://t.me/orientrentcar_images/129" },
+        { name: "Chevrolet Gentra", class: "Economy", price: "500,000", dep: "2,000,000", seats: 5, fuel: "Benzin", cons: "9L", link: "https://t.me/orientrentcar_images/54" },
+        { name: "Chevrolet Monza", class: "Economy", price: "600,000", dep: "3,000,000", seats: 5, fuel: "Benzin", cons: "7L", link: "https://t.me/orientrentcar_images/142" },
+        { name: "Chevrolet Onix", class: "Economy", price: "500,000", dep: "2,000,000", seats: 5, fuel: "Benzin", cons: "6.5L", link: "https://t.me/orientrentcar_images/285" },
+        { name: "Chevrolet Tracker 2", class: "Comfort", price: "700,000", dep: "3,000,000", seats: 5, fuel: "Benzin", cons: "7.5L", link: "https://t.me/orientrentcar_images/129" },
         { name: "Captiva 4", class: "Comfort", price: "800,000", dep: "3,000,000", seats: 7, fuel: "Benzin", cons: "12L", link: "https://t.me/orientrentcar_images/240" },
-        { name: "Equinox", class: "Comfort", price: "1,200,000", dep: "3,000,000", seats: 5, fuel: "Benzin", cons: "10L", link: "https://t.me/orientrentcar_images/112" },
+        { name: "Chevrolet Equinox", class: "Comfort", price: "1,200,000", dep: "3,000,000", seats: 5, fuel: "Benzin", cons: "10L", link: "https://t.me/orientrentcar_images/112" },
         { name: "KIA Carnival 9-seater", class: "Business", price: "1,600,000", dep: "5,000,000", seats: 9, fuel: "Dizel", cons: "9L", link: "https://t.me/orientrentcar_images/94" },
         { name: "KIA Carnival 11-seater", class: "Business", price: "1,600,000", dep: "5,000,000", seats: 11, fuel: "Benzin", cons: "10L", link: "https://t.me/orientrentcar_images/103" },
         { name: "KIA Carnival High Limousine", class: "Business", price: "2,500,000", dep: "7,000,000", seats: 7, fuel: "Benzin", cons: "12L", link: "https://t.me/orientrentcar_images/253" },
@@ -372,10 +370,13 @@
         const t = translations[currentLang];
 
         data.forEach(car => {
+            // Rasm nomini standartlashtirish: kichik harf va probellar o'rniga chiziqcha
+            const imageName = car.name.toLowerCase().replace(/ /g, '-');
+            
             grid.innerHTML += `
                 <div class="car-card">
                     <div class="img-box">
-                        <img src="img/${car.name}.jpg" alt="${car.name}" onerror="this.src='https://via.placeholder.com/600x400?text=${car.name}'">
+                        <img src="img/${imageName}.jpg" alt="${car.name}" onerror="this.src='https://via.placeholder.com/600x400?text=${car.name}'">
                     </div>
                     <div class="card-body">
                         <span class="car-class">${car.class}</span>
@@ -392,7 +393,7 @@
                         </div>
                         <div class="btn-group">
                             <a href="${car.link}" target="_blank" class="btn btn-img">${t.view}</a>
-                            <a href="https://wa.me/${WHATSAPP.replace('+','')}" class="btn btn-book">${t.book}</a>
+                            <a href="https://wa.me/${WHATSAPP.replace(/[+ ]/g,'')}" class="btn btn-book">${t.book}</a>
                         </div>
                     </div>
                 </div>
