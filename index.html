@@ -311,11 +311,48 @@
     let currentLang = 'uz';
     const PHONE_NUMBER = "+998993120000";
 
-    const translations = {
-        uz: { deposit: "Depozit", seats: "Kishi", fuel: "Yoqilg'i", cons: "Sarfi", daily: "Kunlik", book: "Band qilish", view: "Rasmlar", search: "Avtomobil qidirish...", all: "Barchasi", class: "Tejamkor" },
-        ru: { deposit: "Депозит", seats: "Мест", fuel: "Топливо", cons: "Расход", daily: "Сутки", book: "Забронировать", view: "Фотографии", search: "Поиск...", all: "Все" },
-        en: { deposit: "Deposit", seats: "Seats", fuel: "Fuel", cons: "Consum.", daily: "Daily", book: "Book Now", view: "Images", search: "Search car...", all: "All" }
-    };
+   const translations = {
+    uz: { 
+        deposit: "Depozit", seats: "Kishi", fuel: "Yoqilg'i", cons: "Sarfi", 
+        daily: "Kunlik", book: "Band qilish", view: "Rasmlar", 
+        search: "Avtomobil qidirish...", all: "Barchasi",
+        // Klasslar tarjimasi
+        economy: "Tejamkor",
+        comfort: "Komfort",
+        business: "Biznes",
+        premium: "Premium",
+        luxury: "Lyuks",
+        electric: "Elektromobil",
+        suv: "Yo'ltanlamas",
+        supercar: "Superkar"
+    },
+    ru: { 
+        deposit: "Депозит", seats: "Мест", fuel: "Топливо", cons: "Расход", 
+        daily: "Сутки", book: "Забронировать", view: "Фотографии", 
+        search: "Поиск...", all: "Все",
+        economy: "Эконом",
+        comfort: "Комфорт",
+        business: "Бизнес",
+        premium: "Премиум",
+        luxury: "Люкс",
+        electric: "Электромобиль",
+        suv: "Внедорожник",
+        supercar: "Суперкар"
+    },
+    en: { 
+        deposit: "Deposit", seats: "Seats", fuel: "Fuel", cons: "Consum.", 
+        daily: "Daily", book: "Book Now", view: "Images", 
+        search: "Search car...", all: "All",
+        economy: "Economy",
+        comfort: "Comfort",
+        business: "Business",
+        premium: "Premium",
+        luxury: "Luxury",
+        electric: "Electric",
+        suv: "SUV",
+        supercar: "Supercar"
+    }
+};
 
     const cars = [
         { name: "Chevrolet Gentra", class: "Economy", price: "500,000", dep: "2,000,000", seats: 5, fuel: "Benzin", cons: "9L", link: "https://t.me/orientrentcar_images/54" },
@@ -356,50 +393,45 @@
 
     const classes = ["Economy", "Comfort", "Business", "Premium", "Luxury", "Electric", "SUV", "Sportcar"];
 
-    function renderFilters() {
-        const filterBox = document.getElementById('filterBox');
-        filterBox.innerHTML = `<button class="filter-btn active" onclick="filterCars('all', this)">${translations[currentLang].all}</button>`;
-        classes.forEach(c => {
-            filterBox.innerHTML += `<button class="filter-btn" onclick="filterCars('${c}', this)">${c}</button>`;
-        });
-    }
+   function renderFilters() {
+    const filterBox = document.getElementById('filterBox');
+    const t = translations[currentLang];
+    
+    // "Barchasi" tugmasi
+    filterBox.innerHTML = `<button class="filter-btn active" onclick="filterCars('all', this)">${t.all}</button>`;
+    
+    // Klasslar ro'yxatini tarjima qilib chiqarish
+    classes.forEach(c => {
+        const translatedClassName = t[c.toLowerCase()] || c;
+        filterBox.innerHTML += `<button class="filter-btn" onclick="filterCars('${c}', this)">${translatedClassName}</button>`;
+    });
+}
+   function renderCars(data) {
+    const grid = document.getElementById('carGrid');
+    grid.innerHTML = '';
+    const t = translations[currentLang]; // Hozirgi tanlangan til tarjimalari
 
-    function renderCars(data) {
-        const grid = document.getElementById('carGrid');
-        grid.innerHTML = '';
-        const t = translations[currentLang];
+    data.forEach(car => {
+        const imageName = car.name.toLowerCase().replace(/ /g, '-');
+        
+        // Klass nomini tarjima qilish (masalan: "Economy" -> "Tejamkor")
+        const translatedClass = t[car.class.toLowerCase()] || car.class;
 
-        data.forEach(car => {
-            // Rasm nomini standartlashtirish: kichik harf va probellar o'rniga chiziqcha
-            const imageName = car.name.toLowerCase().replace(/ /g, '-');
-            
-            grid.innerHTML += `
-                <div class="car-card">
-                    <div class="img-box">
-                        <img src="img/${imageName}.jpg" alt="${car.name}" onerror="this.src='https://via.placeholder.com/600x400?text=${car.name}'">
-                    </div>
-                    <div class="card-body">
-                        <span class="car-class">${car.class}</span>
-                        <h3 class="car-name">${car.name}</h3>
-                        <div class="spec-list">
-                            <div class="spec-item"><i class="fa fa-vault"></i> <span>${t.deposit}:</span> ${car.dep}</div>
-                            <div class="spec-item"><i class="fa fa-users"></i> <span>${car.seats} ${t.seats}</span></div>
-                            <div class="spec-item"><i class="fa fa-gas-pump"></i> <span>${car.fuel}</span></div>
-                            <div class="spec-item"><i class="fa fa-gauge-high"></i> <span>${t.cons}: ${car.cons}</span></div>
-                        </div>
-                        <div class="price-box">
-                            <div class="price-label">${t.daily}</div>
-                            <div class="price-val">${car.price} UZS</div>
-                        </div>
-                        <div class="btn-group">
-                            <a href="${car.link}" target="_blank" class="btn btn-img">${t.view}</a>
-                            <a href="tel:${PHONE_NUMBER}" class="btn btn-book">${t.book}</a>
-                        </div>
-                    </div>
+        grid.innerHTML += `
+            <div class="car-card">
+                <div class="img-box">
+                    <img src="img/${imageName}.jpg" alt="${car.name}" onerror="this.src='https://via.placeholder.com/600x400?text=${car.name}'">
                 </div>
-            `;
-        });
-    }
+                <div class="card-body">
+                    <!-- BU YERDA TARJIMA QILINGAN KLASS CHIQADI -->
+                    <span class="car-class">${translatedClass}</span>
+                    <h3 class="car-name">${car.name}</h3>
+                    ... (qolgan kodlar) ...
+                </div>
+            </div>
+        `;
+    });
+}
 
     function filterCars(cls, btn) {
         document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
