@@ -409,16 +409,14 @@
    function renderCars(data) {
     const grid = document.getElementById('carGrid');
     grid.innerHTML = '';
-    const t = translations[currentLang]; // Hozirgi til tarjimalari
+    const t = translations[currentLang];
 
     data.forEach(car => {
-        // Rasm nomini to'g'irlash: kichik harf, probel o'rniga chiziqcha, qavslarsiz
+        // MUHIM O'ZGARISH SHU YERDA:
         const imageName = car.name.toLowerCase()
-            .replace(/[^a-z0-9 ]/g, '') // Ortiqcha belgilarni o'chirish
-            .trim()
-            .replace(/\s+/g, '-');      // Probelni chiziqchaga aylantirish
+            .replace(/ /g, '-')      // Probelni chiziqcha qiladi
+            .replace(/[()]/g, '');   // Qavslarni o'chiradi (Mercedes-Benz dagi chiziqcha qoladi)
 
-        // Klass nomini tarjima qilish
         const translatedClass = t[car.class.toLowerCase()] || car.class;
 
         grid.innerHTML += `
@@ -444,7 +442,6 @@
 
                     <div class="btn-group">
                         <a href="${car.link}" target="_blank" class="btn btn-img">${t.view}</a>
-                        <!-- Telegramga bog'lanish (username'ni o'zingiznikiga almashtiring) -->
                         <a href="https://t.me/orientrentcar" class="btn btn-book">${t.book}</a>
                     </div>
                 </div>
