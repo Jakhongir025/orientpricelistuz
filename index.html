@@ -44,7 +44,6 @@
 
         .car-card { background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border); overflow: hidden; display: flex; flex-direction: column; position: relative; }
 
-        /* SLIDER CSS */
         .slider-wrapper { position: relative; width: 100%; height: 220px; background: #000; }
         .img-box { display: flex; width: 100%; height: 100%; overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth; scrollbar-width: none; }
         .img-box::-webkit-scrollbar { display: none; }
@@ -72,7 +71,63 @@
         .btn-tg { background: var(--tg-blue); color: white; }
         .btn:hover { opacity: 0.8; transform: translateY(-2px); }
 
-        @media (max-width: 768px) { .logo h1 { font-size: 1.8rem; } .car-grid { grid-template-columns: 1fr; } }
+        /* KALKULYATOR CSS */
+        #calc-floating-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 65px;
+            height: 65px;
+            background: var(--gold);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 5px 20px rgba(212, 175, 55, 0.4);
+            z-index: 1000;
+            transition: 0.3s ease;
+            color: #000;
+            font-size: 24px;
+        }
+        #calc-floating-btn:hover { transform: scale(1.1) rotate(15deg); }
+
+        #calc-modal {
+            display: none;
+            position: fixed;
+            bottom: 110px;
+            right: 30px;
+            width: 350px;
+            background: var(--card-bg);
+            border: 1px solid var(--gold);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.8);
+            z-index: 1001;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        .calc-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+        .calc-head h3 { color: var(--gold); font-size: 18px; text-transform: uppercase; letter-spacing: 2px; }
+        .calc-close { color: var(--text-dim); cursor: pointer; font-size: 20px; }
+
+        .calc-group { margin-bottom: 15px; }
+        .calc-group label { display: block; font-size: 11px; color: var(--text-dim); text-transform: uppercase; margin-bottom: 8px; }
+        .calc-group select, .calc-group input {
+            width: 100%; background: #000; border: 1px solid var(--border); color: #fff; padding: 12px; border-radius: 8px; outline: none; font-size: 14px;
+        }
+        .calc-group select:focus { border-color: var(--gold); }
+
+        .calc-res { background: #000; padding: 15px; border-radius: 8px; margin-top: 20px; border: 1px dashed var(--border); }
+        .res-line { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px; }
+        .res-line span:last-child { color: var(--gold); font-weight: 600; }
+        .res-total { border-top: 1px solid var(--border); padding-top: 10px; margin-top: 10px; font-weight: 700; font-size: 16px; }
+
+        @media (max-width: 480px) {
+            #calc-modal { width: calc(100% - 40px); right: 20px; bottom: 100px; }
+        }
     </style>
 </head>
 <body>
@@ -101,17 +156,54 @@
     <div class="car-grid" id="carGrid"></div>
 </div>
 
+<!-- KALKULYATOR -->
+<div id="calc-floating-btn" onclick="toggleCalc()">
+    <i class="fa fa-calculator"></i>
+</div>
+
+<div id="calc-modal">
+    <div class="calc-head">
+        <h3 id="c_title">Kalkulyator</h3>
+        <i class="fa fa-times calc-close" onclick="toggleCalc()"></i>
+    </div>
+    <div class="calc-group">
+        <label id="c_car">Avtomobil</label>
+        <select id="calcCarSelect" onchange="runCalc()"></select>
+    </div>
+    <div class="calc-group">
+        <label id="c_days">Ijara kunlari</label>
+        <input type="number" id="calcDays" value="1" min="1" oninput="runCalc()">
+    </div>
+    <div class="calc-res">
+        <!-- Kunlik narx yoni chegirma foizi uchun joy -->
+        <div class="res-line"><span id="c_daily">Kunlik:</span> <span id="resDaily">0</span></div>
+        <div class="res-line"><span id="c_rent">Ijara:</span> <span id="resRent">0</span></div>
+        <div class="res-line"><span id="c_dep">Depozit:</span> <span id="resDep">0</span></div>
+        <div class="res-line res-total"><span id="c_grand">Jami:</span> <span id="resGrand">0</span></div>
+    </div>
+</div>
+
 <script>
     let currentLang = 'uz';
     const PHONE_NUMBER = "+998993120000";
     const TG_USERNAME = "orientrentcar";
 
     const translations = {
-        uz: { deposit: "Depozit", seats: "Kishi", fuel: "Yoqilg'i", cons: "Sarfi", daily: "Kunlik", call: "Qo'ng'iroq", telegram: "Telegram", search: "Avtomobil qidirish...", all: "Barchasi", economy: "Tejamkor", comfort: "Komfort", business: "Biznes", premium: "Premium", luxury: "Lyuks", electric: "Elektromobil", suv: "Yo'ltanlamas", sportcar: "Sportavtomobil" },
-        ru: { deposit: "Депозит", seats: "Мест", fuel: "Топливо", cons: "Расход", daily: "Сутки", call: "Позвонить", telegram: "Телеграм", search: "Поиск...", all: "Все", economy: "Эконом", comfort: "Комфорт", business: "Бизнес", premium: "Премиум", luxury: "Люкс", electric: "Электромобиль", suv: "Внедорожник", sportcar: "Спорткар" },
-        en: { deposit: "Deposit", seats: "Seats", fuel: "Fuel", cons: "Consum.", daily: "Daily", call: "Call", telegram: "Telegram", search: "Search...", all: "All", economy: "Economy", comfort: "Comfort", business: "Business", premium: "Premium", luxury: "Luxury", electric: "Electric", suv: "SUV", sportcar: "Sportcar" }
+        uz: { 
+            deposit: "Depozit", seats: "Kishi", fuel: "Yoqilg'i", cons: "Sarfi", daily: "Kunlik", call: "Qo'ng'iroq", telegram: "Telegram", search: "Avtomobil qidirish...", all: "Barchasi", economy: "Tejamkor", comfort: "Komfort", business: "Biznes", premium: "Premium", luxury: "Lyuks", electric: "Elektromobil", suv: "Yo'ltanlamas", sportcar: "Sportavtomobil",
+            c_title: "Kalkulyator", c_car: "Avtomobilni tanlang", c_days: "Ijara kunlari", c_daily: "Kunlik narx", c_rent: "Ijara summasi", c_dep: "Depozit (Zalog)", c_grand: "Jami to'lov"
+        },
+        ru: { 
+            deposit: "Депозит", seats: "Мест", fuel: "Топливо", cons: "Расход", daily: "Сутки", call: "Позвонить", telegram: "Телеграм", search: "Поиск...", all: "Все", economy: "Эконом", comfort: "Комфорт", business: "Бизнес", premium: "Премиум", luxury: "Люкс", electric: "Электромобиль", suv: "Внедорожник", sportcar: "Спорткар",
+            c_title: "Калькулятор", c_car: "Выберите авто", c_days: "Дни аренды", c_daily: "Цена за день", c_rent: "Сумма аренды", c_dep: "Депозит (Залог)", c_grand: "Итого к оплате"
+        },
+        en: { 
+            deposit: "Deposit", seats: "Seats", fuel: "Fuel", cons: "Consum.", daily: "Daily", call: "Call", telegram: "Telegram", search: "Search...", all: "All", economy: "Economy", comfort: "Comfort", business: "Business", premium: "Premium", luxury: "Luxury", electric: "Electric", suv: "SUV", sportcar: "Sportcar",
+            c_title: "Calculator", c_car: "Select vehicle", c_days: "Rental days", c_daily: "Daily rate", c_rent: "Rental total", c_dep: "Deposit fee", c_grand: "Grand total"
+        }
     };
 
+    // Mashinalar ro'yxati
     const cars = [
         { name: "Chevrolet Gentra", class: "Economy", price: "500,000", dep: "2,000,000", seats: 5, fuel: "Benzin", cons: "9L", imgCount: 3 },
         { name: "Chevrolet Monza", class: "Economy", price: "600,000", dep: "3,000,000", seats: 5, fuel: "Benzin", cons: "7L", imgCount: 4 },
@@ -150,6 +242,62 @@
     ];
 
     const classes = ["Economy", "Comfort", "Business", "Premium", "Luxury", "Electric", "SUV", "Sportcar"];
+
+    function toggleCalc() {
+        const modal = document.getElementById('calc-modal');
+        modal.style.display = modal.style.display === 'block' ? 'none' : 'block';
+        if(modal.style.display === 'block') runCalc();
+    }
+
+    function populateCalc() {
+        const select = document.getElementById('calcCarSelect');
+        select.innerHTML = '';
+        cars.forEach((car, index) => {
+            select.innerHTML += `<option value="${index}">${car.name}</option>`;
+        });
+    }
+
+    // SIZ SO'RAGAN YANGI HISOB-KITOB MANTIQI
+    function runCalc() {
+        const index = document.getElementById('calcCarSelect').value;
+        const days = parseInt(document.getElementById('calcDays').value) || 1;
+        const car = cars[index];
+        
+        let basePrice = parseInt(car.price.replace(/,/g, ''));
+        let depValue = parseInt(car.dep.replace(/,/g, ''));
+
+        // YANGI CHEGIRMA STAVKALARI
+        let discountRate = 1.0; // 1-6 kun (0%)
+
+        if (days >= 30) {
+            discountRate = 0.70; // 30% chegirma
+        } else if (days >= 20) {
+            discountRate = 0.80; // 20% chegirma
+        } else if (days >= 15) {
+            discountRate = 0.85; // 15% chegirma
+        } else if (days >= 7) {
+            discountRate = 0.90; // 10% chegirma
+        }
+
+        let dailyWithDisc = basePrice * discountRate;
+        let totalRent = dailyWithDisc * days;
+        let grandTotal = totalRent + depValue;
+
+        // Ekranga chiqarish
+        document.getElementById('resDaily').innerText = Math.round(dailyWithDisc).toLocaleString() + " UZS";
+        document.getElementById('resRent').innerText = Math.round(totalRent).toLocaleString() + " UZS";
+        document.getElementById('resDep').innerText = depValue.toLocaleString() + " UZS";
+        document.getElementById('resGrand').innerText = Math.round(grandTotal).toLocaleString() + " UZS";
+
+        // Chegirma foizini vizual ko'rsatish
+        const discountPercent = Math.round((1 - discountRate) * 100);
+        const dailyLabel = document.getElementById('c_daily');
+        if(discountPercent > 0) {
+            dailyLabel.innerHTML = `${translations[currentLang].daily} <span style="color:var(--gold); font-size:10px;">(-${discountPercent}%)</span>:`;
+        } else {
+            dailyLabel.innerText = translations[currentLang].daily + ":";
+        }
+    }
 
     function renderFilters() {
         const filterBox = document.getElementById('filterBox');
@@ -214,11 +362,24 @@
 
     function setLang(lang) {
         currentLang = lang;
+        const t = translations[lang];
         document.querySelectorAll('.lang-btn').forEach(b => {
             b.classList.remove('active');
             if(b.innerText.toLowerCase() === lang) b.classList.add('active');
         });
-        document.getElementById('searchInput').placeholder = translations[lang].search;
+        document.getElementById('searchInput').placeholder = t.search;
+        
+        // Kalkulyator matnlarini tarjima qilish
+        document.getElementById('c_title').innerText = t.c_title;
+        document.getElementById('c_car').innerText = t.c_car;
+        document.getElementById('c_days').innerText = t.c_days;
+        // Kunlik labelni yangilash
+        runCalc();
+
+        document.getElementById('c_rent').innerText = t.c_rent;
+        document.getElementById('c_dep').innerText = t.c_dep;
+        document.getElementById('c_grand').innerText = t.c_grand;
+
         renderFilters(); renderCars(cars);
     }
 
@@ -227,7 +388,10 @@
         renderCars(cars.filter(c => c.name.toLowerCase().includes(v) || c.class.toLowerCase().includes(v)));
     });
 
-    window.onload = () => setLang('uz');
+    window.onload = () => {
+        populateCalc();
+        setLang('uz');
+    };
 </script>
 </body>
 </html>
