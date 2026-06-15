@@ -2,7 +2,8 @@
 <html lang="uz">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- 1. Zoomni va kadr o'zgarishini taqiqlash uchun viewport yangilandi -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Orient Rent Car | Premium Rental</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -19,8 +20,24 @@
             --tg-blue: #24A1DE;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Montserrat', sans-serif; }
-        body { background-color: var(--dark-bg); color: var(--text-main); overflow-x: hidden; }
+        /* 2. Umumiy kadrni qulflash va qimirlatishni taqiqlash */
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+            font-family: 'Montserrat', sans-serif;
+            -webkit-tap-highlight-color: transparent; /* Mobil bosish effektini o'chirish */
+        }
+
+        html, body { 
+            background-color: var(--dark-bg); 
+            color: var(--text-main); 
+            overflow-x: hidden; 
+            width: 100%;
+            /* Ekranni yaqinlashtirish va ortiqcha imo-ishoralarni cheklash */
+            touch-action: pan-y; 
+            user-select: none; /* Matnni belgilashni taqiqlash (ixtiyoriy) */
+        }
 
         header { padding: 60px 20px; text-align: center; background: linear-gradient(to bottom, #000, var(--dark-bg)); position: relative; }
         .lang-switcher { position: absolute; top: 20px; right: 20px; display: flex; gap: 10px; z-index: 100; }
@@ -44,12 +61,23 @@
 
         .car-card { background: var(--card-bg); border-radius: 12px; border: 1px solid var(--border); overflow: hidden; display: flex; flex-direction: column; position: relative; }
 
-        .slider-wrapper { position: relative; width: 100%; height: 220px; background: #000; }
-        .img-box { display: flex; width: 100%; height: 100%; overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth; scrollbar-width: none; }
-        .img-box::-webkit-scrollbar { display: none; }
-        .img-box img { min-width: 100%; height: 100%; object-fit: cover; scroll-snap-align: start; }
+        /* 3. Rasmlarni barmoq bilan surishni (scroll) o'chirish */
+        .slider-wrapper { position: relative; width: 100%; height: 220px; background: #000; overflow: hidden; }
+        .img-box { 
+            display: flex; 
+            width: 100%; 
+            height: 100%; 
+            overflow-x: hidden; /* Auto dan hidden ga o'zgartirildi */
+            scroll-behavior: smooth; 
+        }
+        .img-box img { 
+            min-width: 100%; 
+            height: 100%; 
+            object-fit: cover; 
+            pointer-events: none; /* Rasmni ushlab sudrashni o'chirish */
+        }
 
-        .slider-arrow { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.4); color: white; border: none; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; z-index: 5; display: flex; align-items: center; justify-content: center; }
+        .slider-arrow { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.5); color: white; border: none; width: 35px; height: 35px; border-radius: 50%; cursor: pointer; z-index: 10; display: flex; align-items: center; justify-content: center; }
         .arrow-left { left: 8px; }
         .arrow-right { right: 8px; }
 
@@ -90,7 +118,6 @@
             color: #000;
             font-size: 24px;
         }
-        #calc-floating-btn:hover { transform: scale(1.1) rotate(15deg); }
 
         #calc-modal {
             display: none;
@@ -156,7 +183,6 @@
     <div class="car-grid" id="carGrid"></div>
 </div>
 
-<!-- KALKULYATOR -->
 <div id="calc-floating-btn" onclick="toggleCalc()">
     <i class="fa fa-calculator"></i>
 </div>
@@ -175,7 +201,6 @@
         <input type="number" id="calcDays" value="1" min="1" oninput="runCalc()">
     </div>
     <div class="calc-res">
-        <!-- Kunlik narx yoni chegirma foizi uchun joy -->
         <div class="res-line"><span id="c_daily">Kunlik:</span> <span id="resDaily">0</span></div>
         <div class="res-line"><span id="c_rent">Ijara:</span> <span id="resRent">0</span></div>
         <div class="res-line"><span id="c_dep">Depozit:</span> <span id="resDep">0</span></div>
@@ -203,7 +228,6 @@
         }
     };
 
-    // Mashinalar ro'yxati
     const cars = [
         { name: "Chevrolet Gentra", class: "Economy", price: "450,000", dep: "2,000,000", seats: 5, fuel: "Benzin", cons: "9L", imgCount: 4 },
         { name: "Chevrolet Monza", class: "Economy", price: "500,000", dep: "3,000,000", seats: 5, fuel: "Benzin", cons: "7L", imgCount: 5 },
@@ -257,7 +281,6 @@
         });
     }
 
-    // SIZ SO'RAGAN YANGI HISOB-KITOB MANTIQI
     function runCalc() {
         const index = document.getElementById('calcCarSelect').value;
         const days = parseInt(document.getElementById('calcDays').value) || 1;
@@ -266,33 +289,22 @@
         let basePrice = parseInt(car.price.replace(/,/g, ''));
         let depValue = parseInt(car.dep.replace(/,/g, ''));
 
-        // YANGI CHEGIRMA STAVKALARI
-        let discountRate = 1.0; // 1-6 kun (0%)
-
-        if (days >= 30) {
-        discountRate = 0.70; // 30% chegirma
-    } else if (days >= 20) {
-        discountRate = 0.80; // 20% chegirma
-    } else if (days >= 15) {
-        discountRate = 0.85; // 15% chegirma
-    } else if (days >= 7) {
-        discountRate = 0.90; // 10% chegirma
-    } else if (days >= 2) {
-        // Bu shart 2, 3, 4, 5, 6 kunlar uchun ishlaydi
-        discountRate = 0.95; // 5% chegirma
-    }
+        let discountRate = 1.0; 
+        if (days >= 30) discountRate = 0.70;
+        else if (days >= 20) discountRate = 0.80;
+        else if (days >= 15) discountRate = 0.85;
+        else if (days >= 7) discountRate = 0.90;
+        else if (days >= 2) discountRate = 0.95;
 
         let dailyWithDisc = basePrice * discountRate;
         let totalRent = dailyWithDisc * days;
         let grandTotal = totalRent + depValue;
 
-        // Ekranga chiqarish
         document.getElementById('resDaily').innerText = Math.round(dailyWithDisc).toLocaleString() + " UZS";
         document.getElementById('resRent').innerText = Math.round(totalRent).toLocaleString() + " UZS";
         document.getElementById('resDep').innerText = depValue.toLocaleString() + " UZS";
         document.getElementById('resGrand').innerText = Math.round(grandTotal).toLocaleString() + " UZS";
 
-        // Chegirma foizini vizual ko'rsatish
         const discountPercent = Math.round((1 - discountRate) * 100);
         const dailyLabel = document.getElementById('c_daily');
         if(discountPercent > 0) {
@@ -354,6 +366,7 @@
 
     function slide(idx, dir) {
         const s = document.getElementById(`slider-${idx}`);
+        // Width ni aniq olish uchun offsetWidth ishlatiladi
         s.scrollBy({ left: dir * s.offsetWidth, behavior: 'smooth' });
     }
 
@@ -371,18 +384,13 @@
             if(b.innerText.toLowerCase() === lang) b.classList.add('active');
         });
         document.getElementById('searchInput').placeholder = t.search;
-        
-        // Kalkulyator matnlarini tarjima qilish
         document.getElementById('c_title').innerText = t.c_title;
         document.getElementById('c_car').innerText = t.c_car;
         document.getElementById('c_days').innerText = t.c_days;
-        // Kunlik labelni yangilash
         runCalc();
-
         document.getElementById('c_rent').innerText = t.c_rent;
         document.getElementById('c_dep').innerText = t.c_dep;
         document.getElementById('c_grand').innerText = t.c_grand;
-
         renderFilters(); renderCars(cars);
     }
 
