@@ -291,10 +291,10 @@
         let depValue = parseInt(car.dep.replace(/,/g, ''));
 
         let discountRate = 1.0; 
-        if (days >= 30) discountRate = 0.70;
-        else if (days >= 20) discountRate = 0.80;
-        else if (days >= 15) discountRate = 0.85;
-        else if (days >= 7) discountRate = 0.90;
+        if (days >= 30) discountRate = 0.80;
+        else if (days >= 20) discountRate = 0.85;
+        else if (days >= 15) discountRate = 0.90;
+        else if (days >= 7) discountRate = 0.95;
         else if (days >= 2) discountRate = 0.95;
 
         let dailyWithDisc = basePrice * discountRate;
